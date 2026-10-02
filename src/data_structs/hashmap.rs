@@ -1,20 +1,18 @@
 use std::collections::LinkedList;
 use std::hash::{DefaultHasher, Hash, Hasher};
+use std::mem;
 
 struct Slot<K, V> {
     key: K,
     value: V,
 }
 
-pub struct MyHashMap<K: Hash + Eq, V> {
+pub struct HashMap<K: Hash + Eq, V> {
     buckets: Vec<LinkedList<Slot<K, V>>>,
     len: usize,
 }
 
-impl<K, V> MyHashMap<K, V>
-where
-    K: Eq + Hash,
-{
+impl<K: Eq + Hash, V> HashMap<K, V> {
     pub fn new() -> Self {
         Self {
             buckets: (0..16).map(|_| LinkedList::new()).collect(),
@@ -54,7 +52,7 @@ where
 
     fn rehash(&mut self) {
         let new_capacity = self.buckets.len() * 2;
-        let old_buckets = std::mem::replace(
+        let old_buckets = mem::replace(
             &mut self.buckets,
             (0..new_capacity).map(|_| LinkedList::new()).collect(),
         );
@@ -72,7 +70,7 @@ where
         let list = &mut self.buckets[index];
 
         match list.iter_mut().find(|s| s.key == key) {
-            Some(s) => Some(std::mem::replace(&mut s.value, value)),
+            Some(s) => Some(mem::replace(&mut s.value, value)),
             None => {
                 list.push_back(Slot { key, value });
                 None
@@ -105,7 +103,7 @@ where
     }
 }
 
-impl<K, V> Default for MyHashMap<K, V>
+impl<K, V> Default for HashMap<K, V>
 where
     K: Eq + Hash,
 {
