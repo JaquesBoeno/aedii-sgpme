@@ -10,6 +10,7 @@ struct Slot<K, V> {
 pub struct HashMap<K: Hash + Eq, V> {
     buckets: Vec<LinkedList<Slot<K, V>>>,
     len: usize,
+    collisions_qtt: usize,
 }
 
 impl<K: Eq + Hash, V> HashMap<K, V> {
@@ -17,6 +18,7 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
         Self {
             buckets: (0..16).map(|_| LinkedList::new()).collect(),
             len: 0,
+            collisions_qtt: 0,
         }
     }
 
@@ -42,10 +44,15 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
 
     pub fn remove(&mut self, key: &K) -> Option<V> {
         let index = self.hash_helper(key);
-        let removed = self.buckets[index].extract_if(|s| s.key == *key).next();
+        let list = &mut self.buckets[index];
+        let has_collision = list.len() > 1;
+        let removed = list.extract_if(|s| s.key == *key).next();
 
         removed.map(|s| {
             self.len -= 1;
+            if has_collision {
+                self.collisions_qtt -= 1;
+            }
             s.value
         })
     }
@@ -56,6 +63,7 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
             &mut self.buckets,
             (0..new_capacity).map(|_| LinkedList::new()).collect(),
         );
+        self.collisions_qtt = 0;
 
         for list in old_buckets {
             for slot in list {
@@ -72,6 +80,9 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
         match list.iter_mut().find(|s| s.key == key) {
             Some(s) => Some(mem::replace(&mut s.value, value)),
             None => {
+                if !list.is_empty() {
+                    self.collisions_qtt += 1;
+                }
                 list.push_back(Slot { key, value });
                 None
             }
@@ -80,6 +91,10 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
 
     pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn collisions_qtt(&self) -> usize {
+        self.collisions_qtt
     }
 
     pub fn is_empty(&self) -> bool {
@@ -93,7 +108,7 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
     }
 
     #[inline]
-    fn load_factor(&self) -> f64 {
+    pub fn load_factor(&self) -> f64 {
         (self.len as f64) / (self.buckets.len() as f64)
     }
 
