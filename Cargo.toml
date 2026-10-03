@@ -7,3 +7,4 @@ edition = "2024"
 tokio = { version = "*", features = ["macros", "rt-multi-thread"] }
 anyhow = "1.0"
 reqwest = "0.13.5"
+strum = { version = "0.28", features = ["derive"] }
