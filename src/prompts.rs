@@ -25,7 +25,11 @@ pub fn choice_prompt<T: IntoEnumIterator + EnumMessage + Copy>(message: &str) ->
         let variants: Vec<T> = T::iter().collect();
         for (i, v) in variants.iter().enumerate() {
             let msg = v.get_message().unwrap_or("—");
-            print!("  [{}] {}", i, msg);
+            print!("  [{}] {}\t", i, msg);
+
+            if (i + 1) % 3 == 0 {
+                println!();
+            }
         }
 
         print!("\nDigite sua Escolha: ");
@@ -42,7 +46,7 @@ pub fn choice_prompt<T: IntoEnumIterator + EnumMessage + Copy>(message: &str) ->
             return variants[idx];
         }
 
-        println!("Opção inválida, tente de novo.");
+        println!("\nOpção inválida, tente de novo.");
     }
 }
 
