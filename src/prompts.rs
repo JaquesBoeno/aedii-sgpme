@@ -40,13 +40,15 @@ pub fn choice_prompt<T: IntoEnumIterator + EnumMessage + Copy>(message: &str) ->
             .read_line(&mut input)
             .expect("Failed to read line");
 
+        println!();
+
         if let Ok(idx) = input.trim().parse::<usize>()
             && idx < variants.len()
         {
             return variants[idx];
         }
 
-        println!("\nOpção inválida, tente de novo.");
+        println!("Opção inválida, tente de novo.");
     }
 }
 

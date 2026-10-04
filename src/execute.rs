@@ -12,8 +12,11 @@ enum Actions {
     #[strum(message = "Listar (Por Criterio)")]
     List,
 
-    #[strum(message = "Função adicional (I6.4)")]
+    #[strum(message = "Função adicional  ")]
     AditionalFunction,
+
+    #[strum(message = "Algoritimo Guloso ")]
+    AlgGuloso,
 
     #[strum(message = "Sair")]
     Exit,
@@ -23,21 +26,28 @@ pub fn run() {
     loop {
         match choice_prompt::<Actions>("Qual operação você deseja realizar?") {
             Actions::Query => {
-                todo!("Query");
+                println!("Busca requerida seção 6.1\nTalvez fazer busca exata por ID");
             }
             Actions::Search => {
-                todo!("Search");
+                println!(
+                    "Procurar requerida seção 6.2\nBusca lexicografica, futuramente usando trie"
+                );
             }
             Actions::List => {
-                todo!("List");
+                println!(
+                    "Listagem requerida seção 6.3\nListar todos elementos que batam com alguma caracteristica"
+                );
             }
             Actions::AditionalFunction => {
-                todo!("Função Adicional");
+                println!("Função Adicional requerida seção 6.4\nAinda a se decidir");
+            }
+            Actions::AlgGuloso => {
+                println!("Algoritimo Guloso requerido seção 7")
             }
             Actions::Exit => {
                 break;
             }
         }
-        // println!();
+        println!();
     }
 }
