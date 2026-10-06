@@ -2,15 +2,15 @@ use aedii_sgpme::execute;
 
 use aedii_sgpme::models::{Nave, Pessoa, Planeta};
 use aedii_sgpme::rest_client::{ClienteSwapi, Resultado};
-/*
+
 fn main() {
     execute::run();
 }
-*/
+
 
 // TESTE DAS FUNCOES DO CLIENT
 
-
+/*
 #[tokio::main]
 async fn main() -> Resultado<()> {
     let cliente = ClienteSwapi::novo();
@@ -37,3 +37,4 @@ async fn main() -> Resultado<()> {
 
     Ok(())
 }
+*/
