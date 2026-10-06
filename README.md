@@ -7,4 +7,4 @@
 
 ## Tecnologias:
 - Linguagem: Rust
-- API: a definir
+- API: SWAPI
