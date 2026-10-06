@@ -1,131 +1,86 @@
+use serde::Deserialize;
+use serde::de::DeserializeOwned;
 
-use std::error::Error;
+use crate::models::Recurso;
 
-use json::JsonValue;
+const URL_BASE: &str = "https://swapi.dev/api";
 
-use crate::models::*;
-use crate::parser::*;
+// reqwest já decodifica o JSON, então só existe um tipo de erro
+pub type Resultado<T> = std::result::Result<T, reqwest::Error>;
 
-// aparentemente pra nao travar tudo precisa desse aglomerador de erros
-type Resultado<T> = Result<T, Box<dyn Error>>;
-
-pub struct SwapiClient {
-    http: reqwest::Client, // reutilizar o mesmo client mantém conexões abertas
-    base_url: String,
+/// Envelope que a SWAPI usa em toda listagem e busca
+#[derive(Deserialize)]
+struct Pagina<T> {
+    #[serde(rename = "next")]
+    proxima_pagina: Option<String>,
+    #[serde(rename = "results")]
+    resultados: Vec<T>,
 }
 
-impl SwapiClient {
-    pub fn new() -> Self {
-        SwapiClient {
-            http: reqwest::Client::new(),
-            base_url: "https://swapi.dev/api".to_string(),
+#[derive(Default)]
+pub struct ClienteSwapi {
+    cliente_http: reqwest::Client, // reutilizar o mesmo client tipo um singleton
+}
+
+impl ClienteSwapi {
+    pub fn novo() -> Self {
+        Self::default()
+    }
+
+    /// GET /{recurso}/{id}/
+    pub async fn buscar_por_id<T: Recurso>(&self, id: u32) -> Resultado<T> {
+        self.buscar_por_url(&format!("{URL_BASE}/{}/{id}/", T::CAMINHO))
+            .await
+    }
+
+    /// GET em uma URL qualquer
+    pub async fn buscar_por_url<T: Recurso>(&self, url: &str) -> Resultado<T> {
+        Self::requisitar_e_decodificar(self.cliente_http.get(url)).await
+    }
+
+    /// GET /{recurso}/ seguindo `next` até acabar as páginas
+    pub async fn listar_todos<T: Recurso>(&self) -> Resultado<Vec<T>> {
+        self.juntar_todas_as_paginas(self.cliente_http.get(Self::url_do_recurso::<T>()))
+            .await
+    }
+
+    /// GET /{recurso}/?search={texto} (a query é codificada pelo reqwest)
+    pub async fn pesquisar_por_texto<T: Recurso>(&self, texto: &str) -> Resultado<Vec<T>> {
+        self.juntar_todas_as_paginas(
+            self.cliente_http
+                .get(Self::url_do_recurso::<T>())
+                .query(&[("search", texto)]),
+        )
+        .await
+    }
+
+    fn url_do_recurso<T: Recurso>() -> String {
+        format!("{URL_BASE}/{}/", T::CAMINHO)
+    }
+
+    /// Envia a requisição, falha se o status não for 2xx e converte o JSON para o tipo pedido
+    async fn requisitar_e_decodificar<D: DeserializeOwned>(
+        requisicao: reqwest::RequestBuilder,
+    ) -> Resultado<D> {
+        requisicao.send().await?.error_for_status()?.json().await
+    }
+
+    /// Pede a primeira página e continua pedindo a `proxima_pagina` até ela ser null
+    async fn juntar_todas_as_paginas<T: Recurso>(
+        &self,
+        primeira_requisicao: reqwest::RequestBuilder,
+    ) -> Resultado<Vec<T>> {
+        let mut itens = Vec::new();
+        let mut requisicao_atual = Some(primeira_requisicao);
+
+        while let Some(requisicao) = requisicao_atual {
+            let pagina: Pagina<T> = Self::requisitar_e_decodificar(requisicao).await?;
+            itens.extend(pagina.resultados);
+            requisicao_atual = pagina
+                .proxima_pagina
+                .map(|url| self.cliente_http.get(url));
         }
-    }
 
-    // GET em uma URL e devolve o JSON já parseado
-    async fn get_json(&self, url: &str) -> Resultado<JsonValue> {
-        let body = self
-            .http
-            .get(url)
-            .send()
-            .await?
-            .error_for_status()? // transforma 404/500 em erro generico
-            .text()
-            .await?;
-        Ok(json::parse(&body)?)
-    }
-
-    // GET /{recurso}/{id}/
-    async fn buscar_um<T>(&self, recurso: &str, id: u32, parse: fn(&JsonValue) -> T) -> Resultado<T> {
-        let url = format!("{}/{}/{}/", self.base_url, recurso, id);
-        let json = self.get_json(&url).await?;
-        Ok(parse(&json))
-    }
-
-    // GET /{recurso}/?page={n}
-    async fn buscar_pagina<T>(&self, recurso: &str, pagina: u32, parse: fn(&JsonValue) -> T) -> Resultado<Vec<T>> {
-        let url = format!("{}/{}/?page={}", self.base_url, recurso, pagina);
-        let json = self.get_json(&url).await?;
-        Ok(parse_results(&json, parse))
-    }
-
-    // GET /{recurso}/?search={texto}
-    async fn buscar_texto<T>(&self, recurso: &str, texto: &str, parse: fn(&JsonValue) -> T) -> Resultado<Vec<T>> {
-        // reqwest cuida de codificar a query (espaços, acentos...)
-        let url = format!("{}/{}/", self.base_url, recurso);
-        let body = self
-            .http
-            .get(&url)
-            .query(&[("search", texto)])
-            .send()
-            .await?
-            .error_for_status()?
-            .text()
-            .await?;
-        let json = json::parse(&body)?;
-        Ok(parse_results(&json, parse))
-    }
-
-    // pessoas
-
-    pub async fn get_person(&self, id: u32) -> Resultado<Person> {
-        self.buscar_um("people", id, parse_person).await
-    }
-
-    pub async fn list_people(&self, pagina: u32) -> Resultado<Vec<Person>> {
-        self.buscar_pagina("people", pagina, parse_person).await
-    }
-
-    pub async fn search_people(&self, texto: &str) -> Resultado<Vec<Person>> {
-        self.buscar_texto("people", texto, parse_person).await
-    }
-
-    // planetas
-
-    pub async fn get_planet(&self, id: u32) -> Resultado<Planet> {
-        self.buscar_um("planets", id, parse_planet).await
-    }
-
-    pub async fn list_planets(&self, pagina: u32) -> Resultado<Vec<Planet>> {
-        self.buscar_pagina("planets", pagina, parse_planet).await
-    }
-
-    pub async fn search_planets(&self, texto: &str) -> Resultado<Vec<Planet>> {
-        self.buscar_texto("planets", texto, parse_planet).await
-    }
-
-    // especies
-
-    pub async fn get_species(&self, id: u32) -> Resultado<Species> {
-        self.buscar_um("species", id, parse_species).await
-    }
-
-    pub async fn list_species(&self, pagina: u32) -> Resultado<Vec<Species>> {
-        self.buscar_pagina("species", pagina, parse_species).await
-    }
-
-    // naves
-
-    pub async fn get_starship(&self, id: u32) -> Resultado<Starship> {
-        self.buscar_um("starships", id, parse_starship).await
-    }
-
-    pub async fn list_starships(&self, pagina: u32) -> Resultado<Vec<Starship>> {
-        self.buscar_pagina("starships", pagina, parse_starship).await
-    }
-
-    pub async fn get_person_by_url(&self, url: &str) -> Resultado<Person> {
-        let json = self.get_json(url).await?;
-        Ok(parse_person(&json))
-    }
-
-    pub async fn get_planet_by_url(&self, url: &str) -> Resultado<Planet> {
-        let json = self.get_json(url).await?;
-        Ok(parse_planet(&json))
-    }
-
-    pub async fn get_starship_by_url(&self, url: &str) -> Resultado<Starship> {
-        let json = self.get_json(url).await?;
-        Ok(parse_starship(&json))
+        Ok(itens)
     }
 }
