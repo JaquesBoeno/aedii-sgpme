@@ -24,7 +24,7 @@ impl ClienteSwapi {
         }
     }
 
-    /// GET /{recurso}/{id}/
+    /// GET pra busca por id (nao achoq que vamos usar muito)
     pub async fn buscar_por_id<T: Recurso>(&self, id: u32) -> Resultado<T> {
         let url = format!("{URL_BASE}/{}/{id}/", T::CAMINHO);
         self.buscar_por_url(&url).await
@@ -35,13 +35,13 @@ impl ClienteSwapi {
         self.http.get(url).send().await?.error_for_status()?.json().await
     }
 
-    // GET /{recurso}/ passando por todas as páginas
+    // GET pra listar todos os objetos/recursos de um tipo especifico (tipo pesquisar todos planetas)
     pub async fn listar_todos<T: Recurso>(&self) -> Resultado<Vec<T>> {
         let url = format!("{URL_BASE}/{}/", T::CAMINHO);
         self.ler_paginas(self.http.get(url)).await
     }
 
-    // GET /{recurso}/?search={texto} passando por todas as páginas
+    // GET para pesquisar por texto em todas paginas da api (query)
     pub async fn pesquisar_por_texto<T: Recurso>(&self, texto: &str) -> Resultado<Vec<T>> {
         let url = format!("{URL_BASE}/{}/", T::CAMINHO);
         self.ler_paginas(self.http.get(url).query(&[("search", texto)])).await

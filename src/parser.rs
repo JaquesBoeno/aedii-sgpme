@@ -24,7 +24,7 @@ pub fn converter_pagina<T>(json: &JsonValue, conversor: fn(&JsonValue) -> T) -> 
     json["results"].members().map(conversor).collect()
 }
 
-// parseia cada tipo (recurso) um por um
+// parseia cada tipo de recurso um por um
 
 pub fn converter_pessoa(json: &JsonValue) -> Pessoa {
     Pessoa {
