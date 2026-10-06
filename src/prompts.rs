@@ -51,29 +51,3 @@ pub fn choice_prompt<T: IntoEnumIterator + EnumMessage + Copy>(message: &str) ->
         println!("Opção inválida, tente de novo.");
     }
 }
-
-/*
- * EXEMPLO DE USO TEMPORARIO, REWELL, PLS MOVER PARA A DOCUMENTAÇÂO EM MD
- * QUANDO TU IMPLEMENTAR
- * use aedii_sgpme::prompts;
- * use strum::{EnumIter, EnumMessage};
- *
- * #[derive(Debug, Clone, Copy, EnumIter, EnumMessage)]
- * enum Acao {
- *     #[strum(message = "Criar um novo registro")]
- *     Create,
- *     #[strum(message = "Listar registros")]
- *     List,
- *     #[strum(message = "Sair")]
- *     Exit,
- * }
- *
- * // Para usar as funções você PRECISA definir o tipo de variavel com o : Tipo (: usize), caso
- * // contrario a função não sabe para qual tipo deve fazer o casting do input
- * fn main() {
- *     println!("Hello World!");
- *     let _r: usize = prompts::prompt("Digite um numero qualquer");
- *     let _action: Acao = prompts::choice_prompt("Qual ação deseja fazer?");
- * }
- *
- */
