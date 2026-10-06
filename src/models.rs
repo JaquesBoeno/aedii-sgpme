@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 
-/// como a api segue um padrao de url, basta mapear o tipo para o caminho do recurso
+/// como a api segue um padrao de url, basta mapear a struct para o caminho do recurso
 pub trait Recurso: DeserializeOwned {
     const CAMINHO: &'static str;
 }
@@ -97,22 +97,6 @@ pub struct Nave {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
-pub struct Filme {
-    pub title: String,
-    pub episode_id: u32, // único campo numérico da API
-    pub opening_crawl: String,
-    pub director: String,
-    pub producer: String,
-    pub release_date: String,
-    pub characters: Vec<String>,
-    pub planets: Vec<String>,
-    pub starships: Vec<String>,
-    pub vehicles: Vec<String>,
-    pub species: Vec<String>,
-    pub url: String,
-}
-
 impl Recurso for Pessoa {
     const CAMINHO: &'static str = "people";
 }
@@ -131,8 +115,4 @@ impl Recurso for Veiculo {
 
 impl Recurso for Nave {
     const CAMINHO: &'static str = "starships";
-}
-
-impl Recurso for Filme {
-    const CAMINHO: &'static str = "films";
 }
