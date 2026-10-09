@@ -9,7 +9,7 @@ pub use especie::Especie;
 pub use nave::Nave;
 pub use pessoa::Pessoa;
 pub use planeta::Planeta;
-pub use recurso::Recurso;
+pub use recurso::{Named, Recurso};
 pub use veiculo::Veiculo;
 
 use crate::data_structs::HashMap;
@@ -31,6 +31,18 @@ impl<T> Store<T> {
 
     pub fn get_by_id(&self, key: usize) -> Option<&T> {
         self.map.get(&key)
+    }
+}
+
+impl<T: Named> Store<T> {
+    pub fn prefix_search(&self, prefix: &str) -> Vec<&T> {
+        let mut resultado = Vec::new();
+        for (_, el) in self.map.iter() {
+            if el.name().to_lowercase().starts_with(&prefix.to_lowercase()) {
+                resultado.push(el);
+            }
+        }
+        resultado
     }
 }
 
