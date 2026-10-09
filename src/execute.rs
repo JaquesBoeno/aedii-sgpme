@@ -6,7 +6,6 @@ mod element_kind;
 mod greedy;
 mod list;
 mod menu;
-mod metrics;
 mod query;
 mod search;
 
