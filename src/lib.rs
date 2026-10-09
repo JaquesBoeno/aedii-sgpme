@@ -3,3 +3,4 @@ pub mod execute;
 pub mod models;
 pub mod prompts;
 pub mod rest_client;
+pub mod hash_loader;

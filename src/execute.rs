@@ -1,4 +1,5 @@
 use crate::prompts::choice_prompt;
+use crate::hash_loader::load_all_data;
 use strum::{EnumIter, EnumMessage};
 
 #[derive(Debug, Clone, Copy, EnumIter, EnumMessage)]
@@ -22,7 +23,20 @@ enum Actions {
     Exit,
 }
 
-pub fn run() {
+pub async fn run() {
+    // Carrega todos os dados da SWAPI para as tabelas Hash ANTES de iniciar o menu
+    println!("Iniciando sistema... Carregando base de dados...");
+    
+    let tabelas = match load_all_data().await {
+        Ok(t) => t,
+        Err(e) => {
+            println!("Erro crítico ao carregar dados da API: {}", e);
+            return;
+        }
+    };
+    
+    println!("\nDados carregados com sucesso! Iniciando menu...\n");
+
     loop {
         match choice_prompt::<Actions>("Qual operação você deseja realizar?") {
             Actions::Query => {
