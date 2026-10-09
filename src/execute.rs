@@ -1,12 +1,12 @@
 use crate::{hash_loader::load_all_data, models::DataBase};
 
 mod actions;
-mod additional;
 mod element_kind;
 mod greedy;
 mod list;
 mod menu;
 mod metrics;
+mod min_fuel;
 mod query;
 mod search;
 

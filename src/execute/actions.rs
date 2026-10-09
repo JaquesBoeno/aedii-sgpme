@@ -11,10 +11,10 @@ pub enum Actions {
     #[strum(message = "Listar (Por Criterio)")]
     List,
 
-    #[strum(message = "Função adicional  ")]
-    AditionalFunction,
+    #[strum(message = "Combustível Mínimo (Até um Planeta)")]
+    MinFuel,
 
-    #[strum(message = "Algoritmo Guloso ")]
+    #[strum(message = "Algoritmo Guloso")]
     AlgGuloso,
 
     #[strum(message = "Metricas do HashMap")]

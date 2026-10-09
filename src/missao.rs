@@ -1,4 +1,4 @@
-use crate::models::DataBase;
+use crate::models::{DataBase, Planeta};
 use crate::prompts::prompt;
 
 pub struct PlanetaAvaliado {
@@ -8,17 +8,26 @@ pub struct PlanetaAvaliado {
     pub razao: f64,      // Benefício / Custo
 }
 
+/// Combustível necessário para chegar a um planeta (None se o dado for desconhecido).
+/// Usado pelo algoritmo guloso e pela operação adicional, para os dois serem consistentes.
+pub fn custo_combustivel(planeta: &Planeta) -> Option<f64> {
+    planeta
+        .orbital_period
+        .parse::<f64>()
+        .ok()
+        .filter(|v| v.is_finite() && *v > 0.0)
+}
+
 pub fn planejar_missao_extracao(db: &DataBase) {
     println!("\n--- ALGORITMO GULOSO: PLANEAMENTO DE MISSÃO ---");
     let combustivel_maximo: f64 = prompt("Digite a capacidade máxima de combustível da nave (ex: 15000):");
-    
+
     let mut candidatos: Vec<PlanetaAvaliado> = Vec::new();
 
     // Extrai os planetas da Hash customizada
     for (_, planeta) in db.planets.map.iter() {
-        let custo = match planeta.orbital_period.parse::<f64>() {
-            Ok(val) if val > 0.0 => val,
-            _ => continue, // Evita divisão por zero
+        let Some(custo) = custo_combustivel(planeta) else {
+            continue; // desconhecido ou <= 0: evita divisão por zero
         };
 
         let beneficio = match planeta.diameter.parse::<f64>() {
@@ -55,7 +64,7 @@ pub fn planejar_missao_extracao(db: &DataBase) {
     println!("Combustível Inicial: {:.2}", combustivel_maximo);
     println!("Benefício Total Acumulado (Área): {:.2}", beneficio_acumulado);
     println!("Combustível Ocioso (Sobrando): {:.2}", combustivel_restante);
-    
+
     if plano_de_voo.is_empty() {
         println!("Nenhum planeta coube no orçamento estipulado.");
     } else {
