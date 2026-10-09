@@ -1,5 +1,4 @@
-use super::DataBase;
-use crate::data_structs::HashMap;
+use crate::models::{DataBase, Store};
 use crate::prompts::{choice_prompt, prompt};
 use std::fmt::Display;
 use strum::{EnumIter, EnumMessage};
@@ -80,8 +79,8 @@ pub fn menu(db: &DataBase) {
     }
 }
 
-fn consultar<T: Display>(mapa: &HashMap<u32, T>, id: u32) {
-    match mapa.get(&id) {
+fn consultar<T: Display>(mapa: &Store<T>, id: usize) {
+    match mapa.get_by_id(id) {
         Some(x) => println!("{x}"),
         None => println!("Elemento não encontrado!"),
     }
@@ -89,10 +88,10 @@ fn consultar<T: Display>(mapa: &HashMap<u32, T>, id: u32) {
 
 fn query(db: &DataBase) {
     let kinda = choice_prompt::<ElementKinda>("Que tipo de elemento você deseja consultar?");
-    let id = prompt::<u32>("Digite o ID desse elemento");
+    let id = prompt::<usize>("Digite o ID desse elemento");
 
     match kinda {
-        ElementKinda::People => consultar(&db.peoples, id),
+        ElementKinda::People => consultar(&db.people, id),
         ElementKinda::Planets => consultar(&db.planets, id),
         ElementKinda::Starships => consultar(&db.starships, id),
         ElementKinda::Vehicles => consultar(&db.vehicles, id),
