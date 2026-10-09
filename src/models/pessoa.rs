@@ -33,6 +33,10 @@ impl Recurso for Pessoa {
 
 impl fmt::Display for Pessoa {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} (nascimento: {}, gênero: {})", self.name, self.birth_year, self.gender)
+        write!(
+            f,
+            "{} (nascimento: {}, gênero: {})",
+            self.name, self.birth_year, self.gender
+        )
     }
 }

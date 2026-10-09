@@ -26,10 +26,7 @@ pub fn run(db: &DataBase) {
     println!("Planetas disponíveis:");
     for (id, planeta) in &planetas {
         match custo_combustivel(planeta) {
-            Some(_) => println!(
-                "  [{:>2}] {:<22}",
-                id, planeta.name
-            ),
+            Some(_) => println!("  [{:>2}] {:<22}", id, planeta.name),
             None => println!(
                 "  [{:>2}] {:<22} (dados insuficientes para calcular)",
                 id, planeta.name

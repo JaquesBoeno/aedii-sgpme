@@ -33,6 +33,10 @@ impl Recurso for Veiculo {
 
 impl fmt::Display for Veiculo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} (modelo: {}, classe: {})", self.name, self.model, self.vehicle_class)
+        write!(
+            f,
+            "{} (modelo: {}, classe: {})",
+            self.name, self.model, self.vehicle_class
+        )
     }
 }

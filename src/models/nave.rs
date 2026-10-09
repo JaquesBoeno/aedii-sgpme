@@ -36,6 +36,10 @@ impl Recurso for Nave {
 
 impl fmt::Display for Nave {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} (modelo: {}, classe: {})", self.name, self.model, self.starship_class)
+        write!(
+            f,
+            "{} (modelo: {}, classe: {})",
+            self.name, self.model, self.starship_class
+        )
     }
 }

@@ -4,15 +4,18 @@ use crate::rest_client::{ClienteSwapi, Resultado};
 // Versão simplificada: Pega no penúltimo elemento entre as barras e tenta converter
 fn extrair_id(url: &str) -> usize {
     url.split('/')
-       .nth_back(1)
-       .and_then(|id| id.parse::<usize>().ok())
-       .unwrap_or(0)
+        .nth_back(1)
+        .and_then(|id| id.parse::<usize>().ok())
+        .unwrap_or(0)
 }
 
 fn imprimir_store<T>(nome: &str, store: &Store<T>) {
     println!(
         "Hash de {} preenchida! (Total: {} | Colisões: {} | Fator de Carga: {:.2})",
-        nome, store.map.len(), store.map.collisions_qtt(), store.map.load_factor()
+        nome,
+        store.map.len(),
+        store.map.collisions_qtt(),
+        store.map.load_factor()
     );
 }
 
@@ -27,7 +30,9 @@ pub fn imprimir_estatisticas(db: &DataBase) {
 pub async fn load_all_data(db: &mut DataBase) -> Resultado<()> {
     let cliente = ClienteSwapi::novo();
 
-    println!("A transferir dados da SWAPI para preencher as tabelas hash... Isto pode demorar alguns segundos.\n");
+    println!(
+        "A transferir dados da SWAPI para preencher as tabelas hash... Isto pode demorar alguns segundos.\n"
+    );
 
     let pessoas = cliente.listar_todos::<Pessoa>().await?;
     for pessoa in pessoas {

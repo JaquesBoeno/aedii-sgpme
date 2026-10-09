@@ -31,6 +31,10 @@ impl Recurso for Planeta {
 
 impl fmt::Display for Planeta {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} (clima: {}, população: {})", self.name, self.climate, self.population)
+        write!(
+            f,
+            "{} (clima: {}, população: {})",
+            self.name, self.climate, self.population
+        )
     }
 }
