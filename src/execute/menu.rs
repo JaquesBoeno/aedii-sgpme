@@ -17,7 +17,7 @@ enum Actions {
     #[strum(message = "Função adicional  ")]
     AditionalFunction,
 
-    #[strum(message = "Algoritimo Guloso ")]
+    #[strum(message = "Algoritmo Guloso ")]
     AlgGuloso,
 
     #[strum(message = "Metricas do HashMap")]
@@ -67,7 +67,7 @@ pub fn menu(db: &DataBase) {
                 println!("Função Adicional requerida seção 6.4\nAinda a se decidir");
             }
             Actions::AlgGuloso => {
-                println!("Algoritimo Guloso requerido seção 7")
+                crate::missao::planejar_missao_extracao(db);
             }
             Actions::Metricas => {
                 println!("Exibir metricas do hashmap");
