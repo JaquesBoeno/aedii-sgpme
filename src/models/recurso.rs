@@ -4,3 +4,7 @@ use serde::de::DeserializeOwned;
 pub trait Recurso: DeserializeOwned {
     const CAMINHO: &'static str;
 }
+
+pub trait Named {
+    fn name(&self) -> &str;
+}

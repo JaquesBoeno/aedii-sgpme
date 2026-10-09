@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::fmt;
 
-use super::recurso::Recurso;
+use super::recurso::{Named, Recurso};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Pessoa {
@@ -19,6 +19,12 @@ pub struct Pessoa {
     pub vehicles: Vec<String>,
     pub starships: Vec<String>,
     pub url: String,
+}
+
+impl Named for Pessoa {
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 impl Recurso for Pessoa {
