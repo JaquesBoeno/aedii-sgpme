@@ -17,9 +17,6 @@ pub enum Actions {
     #[strum(message = "Algoritmo Guloso")]
     AlgGuloso,
 
-    #[strum(message = "Metricas do HashMap")]
-    Metricas,
-
     #[strum(message = "Sair")]
     Exit,
 }

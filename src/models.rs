@@ -32,6 +32,22 @@ impl<T> Store<T> {
     pub fn get_by_id(&self, key: usize) -> Option<&T> {
         self.map.get(&key)
     }
+
+    pub fn interval_search<F>(&self, min: f64, max: f64, field: F) -> Vec<&T>
+    where
+        F: Fn(&T) -> Option<f64>,
+    {
+        let mut vec: Vec<(f64, &T)> = self
+            .map
+            .iter()
+            .filter_map(|(_, el)| field(el).map(|valor| (valor, el)))
+            .filter(|(valor, _)| *valor >= min && *valor <= max)
+            .collect();
+
+        vec.sort_by(|a, b| a.0.total_cmp(&b.0));
+
+        vec.into_iter().map(|(_, el)| el).collect()
+    }
 }
 
 impl<T: Named> Store<T> {
@@ -64,4 +80,9 @@ impl DataBase {
             starships: Store::new(),
         }
     }
+}
+pub fn parse_numero(texto: &str) -> Option<f64> {
+    let limpo = texto.trim().replace(',', "");
+    let primeiro = limpo.split_whitespace().next()?;
+    primeiro.parse::<f64>().ok()
 }

@@ -5,7 +5,6 @@ mod element_kind;
 mod greedy;
 mod list;
 mod menu;
-mod metrics;
 mod min_fuel;
 mod query;
 mod search;

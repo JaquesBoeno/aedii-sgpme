@@ -32,6 +32,10 @@ impl Recurso for Especie {
 
 impl fmt::Display for Especie {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} (classificação: {}, idioma: {})", self.name, self.classification, self.language)
+        write!(
+            f,
+            "{} (classificação: {}, idioma: {})",
+            self.name, self.classification, self.language
+        )
     }
 }
