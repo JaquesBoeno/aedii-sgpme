@@ -1,4 +1,5 @@
 use std::collections::LinkedList;
+use std::collections::linked_list;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::mem;
 
@@ -11,6 +12,12 @@ pub struct HashMap<K: Hash + Eq, V> {
     buckets: Vec<LinkedList<Slot<K, V>>>,
     len: usize,
     collisions_qtt: usize,
+}
+
+pub struct Iter<'a, K: Hash + Eq, V> {
+    hashmap: &'a HashMap<K, V>,
+    bucket_idx: usize,
+    current: linked_list::Iter<'a, Slot<K, V>>,
 }
 
 impl<K: Eq + Hash, V> HashMap<K, V> {
@@ -101,6 +108,14 @@ impl<K: Eq + Hash, V> HashMap<K, V> {
         self.len == 0
     }
 
+    pub fn iter(&self) -> Iter<'_, K, V> {
+        Iter {
+            hashmap: self,
+            bucket_idx: 0,
+            current: self.buckets[0].iter(),
+        }
+    }
+
     fn hash_helper(&self, key: &K) -> usize {
         let mut hasher = DefaultHasher::new();
         key.hash(&mut hasher);
@@ -124,5 +139,23 @@ where
 {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl<'a, K: Hash + Eq, V> Iterator for Iter<'a, K, V> {
+    type Item = (&'a K, &'a V);
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if let Some(slot) = self.current.next() {
+                return Some((&slot.key, &slot.value));
+            }
+
+            self.bucket_idx += 1;
+            if self.bucket_idx >= self.hashmap.buckets.len() {
+                return None;
+            }
+
+            self.current = self.hashmap.buckets[self.bucket_idx].iter();
+        }
     }
 }

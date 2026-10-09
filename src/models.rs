@@ -1,5 +1,6 @@
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
+use std::fmt;
 
 /// como a api segue um padrao de url, basta mapear a struct para o caminho do recurso
 pub trait Recurso: DeserializeOwned {
@@ -115,4 +116,34 @@ impl Recurso for Veiculo {
 
 impl Recurso for Nave {
     const CAMINHO: &'static str = "starships";
+}
+
+impl fmt::Display for Pessoa {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} (nascimento: {}, gênero: {})", self.name, self.birth_year, self.gender)
+    }
+}
+
+impl fmt::Display for Planeta {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} (clima: {}, população: {})", self.name, self.climate, self.population)
+    }
+}
+
+impl fmt::Display for Especie {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} (classificação: {}, idioma: {})", self.name, self.classification, self.language)
+    }
+}
+
+impl fmt::Display for Veiculo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} (modelo: {}, classe: {})", self.name, self.model, self.vehicle_class)
+    }
+}
+
+impl fmt::Display for Nave {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{} (modelo: {}, classe: {})", self.name, self.model, self.starship_class)
+    }
 }
