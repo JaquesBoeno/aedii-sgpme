@@ -12,7 +12,6 @@ pub fn run(db: &DataBase) {
     // Coleta (id, planeta) da Hash e ordena por id para a listagem ficar estável
     let mut planetas: Vec<(usize, &Planeta)> = db
         .planets
-        .map
         .iter()
         .map(|(id, planeta)| (*id, planeta))
         .collect();

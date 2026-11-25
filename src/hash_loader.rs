@@ -6,9 +6,9 @@ fn imprimir_store<T>(nome: &str, store: &Store<T>) {
     println!(
         "Hash de {} preenchida! (Total: {} | Colisões: {} | Fator de Carga: {:.2})",
         nome,
-        store.map.len(),
-        store.map.collisions_qtt(),
-        store.map.load_factor()
+        store.len(),
+        store.collisions(),
+        store.load_factor()
     );
 }
 

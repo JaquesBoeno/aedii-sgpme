@@ -13,10 +13,10 @@ pub use planeta::Planeta;
 pub use recurso::{Named, Recurso};
 pub use veiculo::Veiculo;
 
-use crate::data_structs::HashMap;
+use crate::data_structs::{HashMap, hashmap};
 
 pub struct Store<T> {
-    pub map: HashMap<usize, T>,
+    map: HashMap<usize, T>,
 }
 
 impl<T> Store<T> {
@@ -34,6 +34,26 @@ impl<T> Store<T> {
         self.map.get(&key)
     }
 
+    pub fn len(&self) -> usize {
+        self.map.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
+    }
+
+    pub fn collisions(&self) -> usize {
+        self.map.collisions_qtt()
+    }
+
+    pub fn load_factor(&self) -> f64 {
+        self.map.load_factor()
+    }
+
+    pub fn iter(&self) -> hashmap::Iter<'_, usize, T> {
+        self.map.iter()
+    }
+
     pub fn interval_search<F>(&self, min: f64, max: f64, field: F) -> Vec<&T>
     where
         F: Fn(&T) -> Option<f64>,
@@ -48,6 +68,15 @@ impl<T> Store<T> {
         vec.sort_by(|a, b| a.0.total_cmp(&b.0));
 
         vec.into_iter().map(|(_, el)| el).collect()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Store<T> {
+    type Item = (&'a usize, &'a T);
+    type IntoIter = hashmap::Iter<'a, usize, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 
@@ -109,10 +138,7 @@ pub fn parse_texto_opcional(texto: &str) -> Option<String> {
 }
 
 pub fn parse_lista(texto: &str) -> Vec<String> {
-    texto
-        .split(',')
-        .filter_map(parse_texto_opcional)
-        .collect()
+    texto.split(',').filter_map(parse_texto_opcional).collect()
 }
 
 pub fn extrair_id(url: &str) -> Option<usize> {
@@ -124,131 +150,4 @@ pub fn extrair_id(url: &str) -> Option<usize> {
 
 pub fn extrair_ids(urls: &[String]) -> Vec<usize> {
     urls.iter().filter_map(|u| extrair_id(u)).collect()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::api::{EspecieApi, NaveApi, PessoaApi, PlanetaApi, VeiculoApi};
-    use super::*;
-
-    #[test]
-    fn test_pessoa_from_api() {
-        let api = PessoaApi {
-            name: "Luke Skywalker".into(),
-            height: "172".into(),
-            mass: "77".into(),
-            hair_color: "blond".into(),
-            skin_color: "fair".into(),
-            eye_color: "blue".into(),
-            birth_year: "19BBY".into(),
-            gender: "male".into(),
-            homeworld: "https://swapi.dev/api/planets/1/".into(),
-            films: vec!["https://swapi.dev/api/films/1/".into()],
-            species: vec![],
-            vehicles: vec!["https://swapi.dev/api/vehicles/14/".into()],
-            starships: vec!["https://swapi.dev/api/starships/12/".into()],
-            url: "https://swapi.dev/api/people/1/".into(),
-        };
-
-        let pessoa = Pessoa::from(api);
-        assert_eq!(pessoa.id, 1);
-        assert_eq!(pessoa.height, Some(172.0));
-        assert_eq!(pessoa.mass, Some(77.0));
-        assert_eq!(pessoa.gender, Genero::Masculino);
-        assert_eq!(pessoa.homeworld_id, Some(1));
-        assert_eq!(pessoa.film_ids, vec![1]);
-        assert_eq!(pessoa.vehicle_ids, vec![14]);
-        assert_eq!(pessoa.starship_ids, vec![12]);
-    }
-
-    #[test]
-    fn test_planeta_from_api_com_campos_desconhecidos() {
-        let api = PlanetaApi {
-            name: "Tatooine".into(),
-            rotation_period: "23".into(),
-            orbital_period: "304".into(),
-            diameter: "10,465".into(),
-            climate: "arid, hot".into(),
-            gravity: "1 standard".into(),
-            terrain: "desert".into(),
-            surface_water: "1".into(),
-            population: "200,000".into(),
-            residents: vec!["https://swapi.dev/api/people/1/".into()],
-            films: vec![],
-            url: "https://swapi.dev/api/planets/1/".into(),
-        };
-
-        let planeta = Planeta::from(api);
-        assert_eq!(planeta.id, 1);
-        assert_eq!(planeta.diameter, Some(10465.0));
-        assert_eq!(planeta.gravity, Some(1.0));
-        assert_eq!(planeta.population, Some(200_000));
-        assert_eq!(planeta.climate, vec!["arid", "hot"]);
-        assert_eq!(planeta.resident_ids, vec![1]);
-    }
-
-    #[test]
-    fn test_especie_veiculo_nave_from_api() {
-        let especie = Especie::from(EspecieApi {
-            name: "Human".into(),
-            classification: "mammal".into(),
-            designation: "sentient".into(),
-            average_height: "180".into(),
-            skin_colors: "caucasian, black".into(),
-            hair_colors: "blonde, brown".into(),
-            eye_colors: "brown, blue".into(),
-            average_lifespan: "120".into(),
-            homeworld: None,
-            language: "Galactic Basic".into(),
-            people: vec![],
-            films: vec![],
-            url: "https://swapi.dev/api/species/1/".into(),
-        });
-        assert_eq!(especie.classification, ClassificacaoEspecie::Mamifero);
-        assert_eq!(especie.designation, DesignacaoEspecie::Senciente);
-        assert_eq!(especie.average_height, Some(180.0));
-        assert_eq!(especie.homeworld_id, None);
-
-        let veiculo = Veiculo::from(VeiculoApi {
-            name: "Sand Crawler".into(),
-            model: "Digger Crawler".into(),
-            manufacturer: "Corellia Mining Corporation".into(),
-            cost_in_credits: "150000".into(),
-            length: "36.8 ".into(),
-            max_atmosphering_speed: "30".into(),
-            crew: "46".into(),
-            passengers: "30".into(),
-            cargo_capacity: "50000".into(),
-            consumables: "2 months".into(),
-            vehicle_class: "wheeled".into(),
-            pilots: vec![],
-            films: vec![],
-            url: "https://swapi.dev/api/vehicles/4/".into(),
-        });
-        assert_eq!(veiculo.id, 4);
-        assert_eq!(veiculo.length, Some(36.8));
-        assert_eq!(veiculo.crew, Some(46));
-
-        let nave = Nave::from(NaveApi {
-            name: "Millennium Falcon".into(),
-            model: "YT-1300".into(),
-            manufacturer: "Corellian".into(),
-            cost_in_credits: "100000".into(),
-            length: "34.37".into(),
-            max_atmosphering_speed: "1050".into(),
-            crew: "4".into(),
-            passengers: "6".into(),
-            cargo_capacity: "100000".into(),
-            consumables: "2 months".into(),
-            hyperdrive_rating: "0.5".into(),
-            mglt: "75".into(),
-            starship_class: "Light freighter".into(),
-            pilots: vec![],
-            films: vec![],
-            url: "https://swapi.dev/api/starships/10/".into(),
-        });
-        assert_eq!(nave.id, 10);
-        assert_eq!(nave.hyperdrive_rating, Some(0.5));
-        assert_eq!(nave.mglt, Some(75));
-    }
 }

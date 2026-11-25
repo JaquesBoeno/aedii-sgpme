@@ -3,18 +3,13 @@ use std::io::{self, Write};
 use strum::{EnumMessage, IntoEnumIterator};
 
 pub fn prompt<T: std::str::FromStr>(message: &str) -> T {
-    let mut input = String::new();
     loop {
         println!("{message}");
 
-        input.clear();
-        let bytes = io::stdin()
+        let mut input = String::new();
+        io::stdin()
             .read_line(&mut input)
             .expect("Failed to read line");
-        if bytes == 0 {
-            eprintln!("\nEntrada encerrada (EOF). Saindo...");
-            std::process::exit(0);
-        }
 
         if let Ok(response) = input.trim().parse::<T>() {
             return response;
@@ -25,11 +20,9 @@ pub fn prompt<T: std::str::FromStr>(message: &str) -> T {
 }
 
 pub fn choice_prompt<T: IntoEnumIterator + EnumMessage + Copy>(message: &str) -> T {
-    let variants: Vec<T> = T::iter().collect();
-    let mut input = String::new();
-
     loop {
         println!("{message}");
+        let variants: Vec<T> = T::iter().collect();
         for (i, v) in variants.iter().enumerate() {
             let msg = v.get_message().unwrap_or("—");
             print!("  [{}] {}\t", i, msg);
@@ -42,14 +35,10 @@ pub fn choice_prompt<T: IntoEnumIterator + EnumMessage + Copy>(message: &str) ->
         print!("\nDigite sua Escolha: ");
         io::stdout().flush().unwrap();
 
-        input.clear();
-        let bytes = io::stdin()
+        let mut input = String::new();
+        io::stdin()
             .read_line(&mut input)
             .expect("Failed to read line");
-        if bytes == 0 {
-            eprintln!("\nEntrada encerrada (EOF). Saindo...");
-            std::process::exit(0);
-        }
 
         println!();
 

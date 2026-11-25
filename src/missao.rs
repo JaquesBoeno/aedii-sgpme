@@ -16,23 +16,18 @@ pub fn custo_combustivel(planeta: &Planeta) -> Option<f64> {
 
 pub fn planejar_missao_extracao(db: &DataBase) {
     println!("\n--- ALGORITMO GULOSO: PLANEAMENTO DE MISSÃO ---");
-    let combustivel_maximo: f64 = loop {
-        let valor: f64 = prompt("Digite a capacidade máxima de combustível da nave (ex: 15000):");
-        if valor.is_finite() && valor > 0.0 {
-            break valor;
-        }
-        println!("A capacidade de combustível deve ser um número positivo e finito.");
-    };
+    let combustivel_maximo: f64 =
+        prompt("Digite a capacidade máxima de combustível da nave (ex: 15000):");
 
     let mut candidatos: Vec<PlanetaAvaliado> = Vec::new();
 
     // Extrai os planetas da Hash customizada
-    for (_, planeta) in db.planets.map.iter() {
+    for (_, planeta) in &db.planets {
         let Some(custo) = custo_combustivel(planeta) else {
             continue; // desconhecido ou <= 0: evita divisão por zero
         };
 
-        let Some(beneficio) = planeta.diameter.filter(|v| v.is_finite() && *v > 0.0) else {
+        let Some(beneficio) = planeta.diameter else {
             continue;
         };
 
@@ -45,7 +40,7 @@ pub fn planejar_missao_extracao(db: &DataBase) {
     }
 
     // Ordenação Otimizada: Estritamente decrescente baseada na heurística (Razão)
-    candidatos.sort_by(|a, b| b.razao.total_cmp(&a.razao));
+    candidatos.sort_by(|a, b| b.razao.partial_cmp(&a.razao).unwrap());
 
     let mut plano_de_voo: Vec<&PlanetaAvaliado> = Vec::new();
     let mut combustivel_restante = combustivel_maximo;

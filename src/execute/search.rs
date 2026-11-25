@@ -17,14 +17,7 @@ pub fn run(db: &DataBase) {
 }
 
 fn pesquisar<T: Display + Named>(store: &Store<T>, prefix: &str) {
-    let encontrados = store.prefix_search(prefix);
-
-    if encontrados.is_empty() {
-        println!("Nenhum elemento encontrado com esse prefixo.");
-        return;
-    }
-
-    for el in encontrados {
-        println!("{el}");
+    for i in store.prefix_search(prefix) {
+        println!("{}", i);
     }
 }
