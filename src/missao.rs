@@ -11,11 +11,7 @@ pub struct PlanetaAvaliado {
 /// Combustível necessário para chegar a um planeta (None se o dado for desconhecido).
 /// Usado pelo algoritmo guloso e pela operação adicional, para os dois serem consistentes.
 pub fn custo_combustivel(planeta: &Planeta) -> Option<f64> {
-    planeta
-        .orbital_period
-        .parse::<f64>()
-        .ok()
-        .filter(|v| v.is_finite() && *v > 0.0)
+    planeta.orbital_period.filter(|v| v.is_finite() && *v > 0.0)
 }
 
 pub fn planejar_missao_extracao(db: &DataBase) {
@@ -31,9 +27,8 @@ pub fn planejar_missao_extracao(db: &DataBase) {
             continue; // desconhecido ou <= 0: evita divisão por zero
         };
 
-        let beneficio = match planeta.diameter.parse::<f64>() {
-            Ok(val) => val,
-            _ => continue,
+        let Some(beneficio) = planeta.diameter else {
+            continue;
         };
 
         candidatos.push(PlanetaAvaliado {
