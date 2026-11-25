@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::api::EspecieApi;
-use super::recurso::Named;
+use super::recurso::Entity;
 use super::{extrair_id, extrair_ids, parse_lista, parse_numero, parse_texto_opcional};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -118,9 +118,13 @@ impl From<EspecieApi> for Especie {
     }
 }
 
-impl Named for Especie {
+impl Entity for Especie {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn id(&self) -> usize {
+        self.id
     }
 }
 

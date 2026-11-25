@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::api::PlanetaApi;
-use super::recurso::Named;
+use super::recurso::Entity;
 use super::{extrair_id, extrair_ids, parse_lista, parse_numero, parse_u64};
 
 #[derive(Debug, Clone)]
@@ -41,9 +41,13 @@ impl From<PlanetaApi> for Planeta {
     }
 }
 
-impl Named for Planeta {
+impl Entity for Planeta {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn id(&self) -> usize {
+        self.id
     }
 }
 

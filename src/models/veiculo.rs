@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::api::VeiculoApi;
-use super::recurso::Named;
+use super::recurso::Entity;
 use super::{extrair_id, extrair_ids, parse_numero, parse_texto_opcional, parse_u32, parse_u64};
 
 #[derive(Debug, Clone)]
@@ -45,9 +45,13 @@ impl From<VeiculoApi> for Veiculo {
     }
 }
 
-impl Named for Veiculo {
+impl Entity for Veiculo {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn id(&self) -> usize {
+        self.id
     }
 }
 

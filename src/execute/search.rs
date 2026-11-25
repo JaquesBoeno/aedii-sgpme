@@ -1,5 +1,5 @@
 use super::element_kind::ElementKinda;
-use crate::models::{DataBase, Named, Store};
+use crate::models::{DataBase, Entity, Store};
 use crate::prompts::{choice_prompt, prompt};
 use std::fmt::Display;
 
@@ -16,7 +16,7 @@ pub fn run(db: &DataBase) {
     }
 }
 
-fn pesquisar<T: Display + Named>(store: &Store<T>, prefix: &str) {
+fn pesquisar<T: Display + Entity>(store: &Store<T>, prefix: &str) {
     for i in store.prefix_search(prefix) {
         println!("{}", i);
     }

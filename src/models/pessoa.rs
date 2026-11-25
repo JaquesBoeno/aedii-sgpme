@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::api::PessoaApi;
-use super::recurso::Named;
+use super::recurso::Entity;
 use super::{extrair_id, extrair_ids, parse_lista, parse_numero, parse_texto_opcional};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -84,9 +84,13 @@ impl From<PessoaApi> for Pessoa {
     }
 }
 
-impl Named for Pessoa {
+impl Entity for Pessoa {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn id(&self) -> usize {
+        self.id
     }
 }
 

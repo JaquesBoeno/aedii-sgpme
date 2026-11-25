@@ -1,7 +1,7 @@
 use std::fmt;
 
 use super::api::NaveApi;
-use super::recurso::Named;
+use super::recurso::Entity;
 use super::{extrair_id, extrair_ids, parse_numero, parse_texto_opcional, parse_u32, parse_u64};
 
 #[derive(Debug, Clone)]
@@ -49,9 +49,13 @@ impl From<NaveApi> for Nave {
     }
 }
 
-impl Named for Nave {
+impl Entity for Nave {
     fn name(&self) -> &str {
         &self.name
+    }
+
+    fn id(&self) -> usize {
+        self.id
     }
 }
 

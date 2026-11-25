@@ -10,7 +10,7 @@ pub use especie::{ClassificacaoEspecie, DesignacaoEspecie, Especie};
 pub use nave::Nave;
 pub use pessoa::{Genero, Pessoa};
 pub use planeta::Planeta;
-pub use recurso::{Named, Recurso};
+pub use recurso::{Entity, Recurso};
 pub use veiculo::Veiculo;
 
 use crate::data_structs::{HashMap, hashmap};
@@ -80,7 +80,7 @@ impl<'a, T> IntoIterator for &'a Store<T> {
     }
 }
 
-impl<T: Named> Store<T> {
+impl<T: Entity> Store<T> {
     pub fn prefix_search(&self, prefix: &str) -> Vec<&T> {
         let mut resultado = Vec::new();
         for (_, el) in self.map.iter() {
