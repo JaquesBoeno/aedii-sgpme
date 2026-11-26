@@ -2,7 +2,7 @@ use std::fmt;
 
 use super::api::PlanetaApi;
 use super::recurso::Entity;
-use super::{extrair_id, extrair_ids, parse_lista, parse_numero, parse_u64};
+use super::{extrair_id, extrair_ids, parse_lista, parse_numero};
 
 #[derive(Debug, Clone)]
 pub struct Planeta {
@@ -33,7 +33,7 @@ impl From<PlanetaApi> for Planeta {
             gravity: parse_numero(&api.gravity),
             terrain: parse_lista(&api.terrain),
             surface_water: parse_numero(&api.surface_water),
-            population: parse_u64(&api.population),
+            population: parse_numero(&api.population),
             resident_ids: extrair_ids(&api.residents),
             film_ids: extrair_ids(&api.films),
             url: api.url,

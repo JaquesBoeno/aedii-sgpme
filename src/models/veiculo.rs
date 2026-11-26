@@ -2,7 +2,7 @@ use std::fmt;
 
 use super::api::VeiculoApi;
 use super::recurso::Entity;
-use super::{extrair_id, extrair_ids, parse_numero, parse_texto_opcional, parse_u32, parse_u64};
+use super::{extrair_id, extrair_ids, parse_numero, parse_texto_opcional};
 
 #[derive(Debug, Clone)]
 pub struct Veiculo {
@@ -30,12 +30,12 @@ impl From<VeiculoApi> for Veiculo {
             name: api.name,
             model: api.model,
             manufacturer: api.manufacturer,
-            cost_in_credits: parse_u64(&api.cost_in_credits),
+            cost_in_credits: parse_numero(&api.cost_in_credits),
             length: parse_numero(&api.length),
             max_atmosphering_speed: parse_numero(&api.max_atmosphering_speed),
-            crew: parse_u32(&api.crew),
-            passengers: parse_u32(&api.passengers),
-            cargo_capacity: parse_u64(&api.cargo_capacity),
+            crew: parse_numero(&api.crew),
+            passengers: parse_numero(&api.passengers),
+            cargo_capacity: parse_numero(&api.cargo_capacity),
             consumables: parse_texto_opcional(&api.consumables),
             vehicle_class: api.vehicle_class,
             pilot_ids: extrair_ids(&api.pilots),

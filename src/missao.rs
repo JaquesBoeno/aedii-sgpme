@@ -40,7 +40,7 @@ pub fn planejar_missao_extracao(db: &DataBase) {
     }
 
     // Ordenação Otimizada: Estritamente decrescente baseada na heurística (Razão)
-    candidatos.sort_by(|a, b| b.razao.partial_cmp(&a.razao).unwrap());
+    candidatos.sort_by(|a, b| b.razao.total_cmp(&a.razao));
 
     let mut plano_de_voo: Vec<&PlanetaAvaliado> = Vec::new();
     let mut combustivel_restante = combustivel_maximo;

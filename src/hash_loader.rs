@@ -43,6 +43,7 @@ pub async fn load_all_data(db: &mut DataBase) -> Resultado<()> {
         "A transferir dados da SWAPI para preencher as tabelas hash... Isto pode demorar alguns segundos.\n"
     );
 
+    // paralelizar é lindo, 9sec -> 3sec.
     tokio::try_join!(
         carregar_recurso::<PessoaApi, Pessoa>(&cliente, &mut db.people),
         carregar_recurso::<PlanetaApi, Planeta>(&cliente, &mut db.planets),
@@ -50,13 +51,7 @@ pub async fn load_all_data(db: &mut DataBase) -> Resultado<()> {
         carregar_recurso::<VeiculoApi, Veiculo>(&cliente, &mut db.vehicles),
         carregar_recurso::<NaveApi, Nave>(&cliente, &mut db.starships),
     )?;
-    //
-    // carregar_recurso::<PessoaApi, Pessoa>(&cliente, &mut db.people).await?;
-    // carregar_recurso::<PlanetaApi, Planeta>(&cliente, &mut db.planets).await?;
-    // carregar_recurso::<EspecieApi, Especie>(&cliente, &mut db.species).await?;
-    // carregar_recurso::<VeiculoApi, Veiculo>(&cliente, &mut db.vehicles).await?;
-    // carregar_recurso::<NaveApi, Nave>(&cliente, &mut db.starships).await?;
-    //
+
     imprimir_estatisticas(db);
 
     Ok(())

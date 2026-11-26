@@ -111,22 +111,32 @@ impl DataBase {
         }
     }
 }
-pub fn parse_numero(texto: &str) -> Option<f64> {
-    let limpo = texto.trim().replace(',', "");
-    let primeiro = limpo.split_whitespace().next()?;
-    primeiro.parse::<f64>().ok().filter(|v| v.is_finite())
+pub trait NumeroSwapi: Sized {
+    fn from_token(token: &str) -> Option<Self>;
 }
 
-pub fn parse_u64(texto: &str) -> Option<u64> {
-    let limpo = texto.trim().replace(',', "");
-    let primeiro = limpo.split_whitespace().next()?;
-    primeiro.parse::<u64>().ok()
+impl NumeroSwapi for f64 {
+    fn from_token(token: &str) -> Option<Self> {
+        token.parse::<f64>().ok().filter(|v| v.is_finite())
+    }
 }
 
-pub fn parse_u32(texto: &str) -> Option<u32> {
-    let limpo = texto.trim().replace(',', "");
+impl NumeroSwapi for u32 {
+    fn from_token(token: &str) -> Option<Self> {
+        token.parse().ok()
+    }
+}
+
+impl NumeroSwapi for u64 {
+    fn from_token(token: &str) -> Option<Self> {
+        token.parse().ok()
+    }
+}
+
+pub fn parse_numero<T: NumeroSwapi>(texto: &str) -> Option<T> {
+    let limpo = texto.replace(',', "");
     let primeiro = limpo.split_whitespace().next()?;
-    primeiro.parse::<u32>().ok()
+    T::from_token(primeiro)
 }
 
 pub fn parse_texto_opcional(texto: &str) -> Option<String> {
